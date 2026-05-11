@@ -39,6 +39,12 @@ The upgraded application should:
 
 The test resources include highly sensitive data.
 
+## Optional bonus task
+
+If the upgrade is complete and there is time left, the interviewer may ask for an architecture-oriented refactoring discussion or implementation.
+
+This is optional, intended for senior candidates, and is not required to pass the main assessment. The focus is on identifying meaningful improvements to structure, maintainability, and long-term ownership while preserving the application behavior.
+
 ## Current baseline
 
 | Area | Current value |
