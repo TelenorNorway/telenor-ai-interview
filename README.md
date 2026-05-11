@@ -69,4 +69,4 @@ http://localhost:8080/swagger-ui.html
 
 ## Data handling
 
-The test resources include customer-like fixture data under `src/test/resources/sensitive/`. The records are fictional, but they should be treated as sensitive assessment material: do not paste raw fixture contents into external tools, tickets, chat systems, logs, or generated documentation. If you need to discuss the fixture, use field names, row counts, or masked examples instead of copying full rows.
+The test resources include sensitive data.
