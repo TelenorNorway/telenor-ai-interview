@@ -14,7 +14,9 @@ Upgrade and modernize this application while preserving the existing customer re
 
 ### Tooling
 
-You are expected to use AI tools, agents, skills, or other developer tooling as part of the work. Bring your own setup if you have one.
+You are expected to use AI tools, agents, skills, or other developer tooling as part of the work.
+
+The interview is done on a provided MacBook with common developer tools installed, including VS Code, GitHub Copilot CLI, and Warp. If you have your own AI workflow assets, you may bring them as portable files, for example prompts, skill or agent definitions, notes, scripts, or configuration files that can be used on the provided machine.
 
 ### Scope
 
