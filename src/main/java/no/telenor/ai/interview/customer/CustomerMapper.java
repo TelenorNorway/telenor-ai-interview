@@ -9,6 +9,7 @@ import no.telenor.ai.interview.support.SupportCaseDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -71,7 +72,7 @@ public class CustomerMapper {
     }
 
     private List<AddressDto> mapAddresses(List<Address> addresses) {
-        return addresses.stream()
+        return CollectionUtils.emptyIfNull(addresses).stream()
                 .map(address -> new AddressDto(
                         address.getId(),
                         address.getType(),
@@ -86,11 +87,11 @@ public class CustomerMapper {
     }
 
     private List<AccountDto> mapAccounts(List<Account> accounts) {
-        return accounts.stream().map(this::toAccountDto).collect(Collectors.toList());
+        return CollectionUtils.emptyIfNull(accounts).stream().map(this::toAccountDto).collect(Collectors.toList());
     }
 
     private List<ConsentDto> mapConsents(List<Consent> consents) {
-        return consents.stream()
+        return CollectionUtils.emptyIfNull(consents).stream()
                 .map(consent -> new ConsentDto(
                         consent.getId(),
                         consent.getCategory(),
@@ -102,6 +103,6 @@ public class CustomerMapper {
     }
 
     private List<SupportCaseDto> mapSupportCases(List<SupportCase> supportCases) {
-        return supportCases.stream().map(this::toSupportCaseDto).collect(Collectors.toList());
+        return CollectionUtils.emptyIfNull(supportCases).stream().map(this::toSupportCaseDto).collect(Collectors.toList());
     }
 }

@@ -66,6 +66,11 @@ public class CustomerController {
         return customerService.getAuditEvents(id);
     }
 
+    @GetMapping("/{id}/risk-lookup")
+    public LegacyRiskLookup riskLookup(@PathVariable Long id) {
+        return customerService.getLegacyRiskLookup(id);
+    }
+
     private String username(Principal principal) {
         return principal == null ? "unknown" : principal.getName();
     }

@@ -62,4 +62,14 @@ class CustomerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.openapi").exists());
     }
+
+    @Test
+    void legacyRiskLookupReturnsDeterministicRiskBand() throws Exception {
+        mockMvc.perform(get("/api/customers/3/risk-lookup")
+                        .with(httpBasic("operator", "operator-password")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerNumber").value("C-100003"))
+                .andExpect(jsonPath("$.riskBand").value("HIGH"))
+                .andExpect(jsonPath("$.lookupUri").value(org.hamcrest.Matchers.containsString("customerNumber=C-100003")));
+    }
 }

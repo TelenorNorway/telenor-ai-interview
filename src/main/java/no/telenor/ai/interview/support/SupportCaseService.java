@@ -7,15 +7,14 @@ import no.telenor.ai.interview.customer.CustomerMapper;
 import no.telenor.ai.interview.customer.CustomerRepository;
 import no.telenor.ai.interview.error.ResourceNotFoundException;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SupportCaseService {
 
-    private static final DateTimeFormatter CASE_NUMBER_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final String CASE_NUMBER_PATTERN = "yyyyMMddHHmmss";
 
     private final SupportCaseRepository supportCaseRepository;
     private final CustomerRepository customerRepository;
@@ -38,7 +37,7 @@ public class SupportCaseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + customerId));
         SupportCase supportCase = new SupportCase(
                 customer,
-                "CASE-" + LocalDateTime.now().format(CASE_NUMBER_FORMAT),
+                "CASE-" + DateTime.now().toString(CASE_NUMBER_PATTERN),
                 request.getTitle(),
                 request.getDescription(),
                 request.getPriority()

@@ -11,9 +11,10 @@ import no.telenor.ai.interview.error.ResourceNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Service
 public class CustomerService {
@@ -22,21 +23,27 @@ public class CustomerService {
     private final AccountRepository accountRepository;
     private final AuditEventRepository auditEventRepository;
     private final CustomerMapper customerMapper;
+    private final LegacyCustomerSnapshotService legacyCustomerSnapshotService;
+    private final LegacyRiskLookupService legacyRiskLookupService;
 
     public CustomerService(CustomerRepository customerRepository,
                            AccountRepository accountRepository,
                            AuditEventRepository auditEventRepository,
-                           CustomerMapper customerMapper) {
+                           CustomerMapper customerMapper,
+                           LegacyCustomerSnapshotService legacyCustomerSnapshotService,
+                           LegacyRiskLookupService legacyRiskLookupService) {
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
         this.auditEventRepository = auditEventRepository;
         this.customerMapper = customerMapper;
+        this.legacyCustomerSnapshotService = legacyCustomerSnapshotService;
+        this.legacyRiskLookupService = legacyRiskLookupService;
     }
 
     @Transactional(readOnly = true)
     public List<CustomerSummary> search(String query, String status) {
         CustomerStatus parsedStatus = parseStatus(status);
-        String normalizedQuery = StringUtils.hasText(query) ? query.trim() : null;
+        String normalizedQuery = StringUtils.trimToNull(query);
         return customerRepository.search(normalizedQuery, parsedStatus).stream()
                 .map(customerMapper::toSummary)
                 .collect(Collectors.toList());
@@ -49,34 +56,38 @@ public class CustomerService {
 
     @Transactional
     public CustomerDetails createCustomer(CreateCustomerRequest request, String username) {
-        if (customerRepository.existsByCustomerNumber(request.getCustomerNumber())) {
-            throw new DuplicateCustomerException("Customer number already exists: " + request.getCustomerNumber());
+        String customerNumber = StringUtils.trimToEmpty(request.getCustomerNumber());
+        String email = StringUtils.trimToEmpty(request.getEmail());
+        validateLegacyEmail(email);
+        if (customerRepository.existsByCustomerNumber(customerNumber)) {
+            throw new DuplicateCustomerException("Customer number already exists: " + customerNumber);
         }
         Customer customer = new Customer(
-                request.getCustomerNumber(),
-                request.getFirstName(),
-                request.getLastName(),
+                customerNumber,
+                StringUtils.trimToEmpty(request.getFirstName()),
+                StringUtils.trimToEmpty(request.getLastName()),
                 request.getDateOfBirth(),
-                request.getEmail(),
-                request.getPhoneNumber()
+                email,
+                StringUtils.trimToNull(request.getPhoneNumber())
         );
         customer.setRiskScore(request.getRiskScore());
         Customer saved = customerRepository.save(customer);
-        auditEventRepository.save(new AuditEvent(saved.getCustomerNumber(), "CUSTOMER_CREATED", "Customer created through API", username));
+        auditEventRepository.save(new AuditEvent(saved.getCustomerNumber(), "CUSTOMER_CREATED", legacyCustomerSnapshotService.toAuditJson(saved, "CUSTOMER_CREATED"), username));
         return customerMapper.toDetails(saved);
     }
 
     @Transactional
     public CustomerDetails updateCustomer(Long id, UpdateCustomerRequest request, String username) {
         Customer customer = findCustomer(id);
-        customer.setFirstName(request.getFirstName());
-        customer.setLastName(request.getLastName());
+        validateLegacyEmail(request.getEmail());
+        customer.setFirstName(StringUtils.trimToEmpty(request.getFirstName()));
+        customer.setLastName(StringUtils.trimToEmpty(request.getLastName()));
         customer.setDateOfBirth(request.getDateOfBirth());
-        customer.setEmail(request.getEmail());
-        customer.setPhoneNumber(request.getPhoneNumber());
+        customer.setEmail(StringUtils.trimToEmpty(request.getEmail()));
+        customer.setPhoneNumber(StringUtils.trimToNull(request.getPhoneNumber()));
         customer.setStatus(request.getStatus());
         customer.setRiskScore(request.getRiskScore());
-        auditEventRepository.save(new AuditEvent(customer.getCustomerNumber(), "CUSTOMER_UPDATED", "Customer profile updated through API", username));
+        auditEventRepository.save(new AuditEvent(customer.getCustomerNumber(), "CUSTOMER_UPDATED", legacyCustomerSnapshotService.toAuditJson(customer, "CUSTOMER_UPDATED"), username));
         return customerMapper.toDetails(customer);
     }
 
@@ -84,7 +95,7 @@ public class CustomerService {
     public void deactivateCustomer(Long id, String username) {
         Customer customer = findCustomer(id);
         customer.setStatus(CustomerStatus.CLOSED);
-        auditEventRepository.save(new AuditEvent(customer.getCustomerNumber(), "CUSTOMER_CLOSED", "Customer deactivated through API", username));
+        auditEventRepository.save(new AuditEvent(customer.getCustomerNumber(), "CUSTOMER_CLOSED", legacyCustomerSnapshotService.toAuditJson(customer, "CUSTOMER_CLOSED"), username));
     }
 
     @Transactional(readOnly = true)
@@ -112,15 +123,26 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public LegacyRiskLookup getLegacyRiskLookup(Long customerId) {
+        return legacyRiskLookupService.lookup(findCustomer(customerId));
+    }
+
     private Customer findCustomer(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + id));
     }
 
     private CustomerStatus parseStatus(String status) {
-        if (!StringUtils.hasText(status)) {
+        if (StringUtils.isBlank(status)) {
             return null;
         }
         return CustomerStatus.valueOf(status.trim().toUpperCase(Locale.ROOT));
+    }
+
+    private void validateLegacyEmail(String email) {
+        if (!EmailValidator.getInstance().isValid(email)) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
     }
 }
