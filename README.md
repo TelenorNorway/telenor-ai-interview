@@ -1,10 +1,37 @@
 # Customer Registry Service
 
-Small customer registry service used for technical assessment work. It manages customer profiles, accounts, addresses, consents, support cases, and audit events through a REST API.
+This repository contains a customer registry service used for a technical assessment. The application manages customer profiles, accounts, addresses, consents, support cases, and audit events through a REST API.
 
-## Stack
+## Assessment task
 
-| Area | Choice |
+Upgrade the application to:
+
+- Latest Spring Boot 4.x
+- Java 25
+- Latest stable Gradle version available when you start the task
+
+You are expected to use AI tools, agents, skills, or other developer tooling as part of the work. Bring your own setup if you have one.
+
+The goal is to modernize the application while preserving the existing customer registry behavior. You may change dependencies, build configuration, application code, tests, and runtime configuration as needed.
+
+Work on a local branch. You do not need to create commits or push your work unless asked during the interview.
+
+## Acceptance criteria
+
+The upgraded application should:
+
+- Build and test successfully from a clean checkout
+- Start locally without manual database setup
+- Preserve the existing customer registry functionality
+- Keep the REST API usable
+- Keep the test suite meaningful and passing
+- Use dependencies and build configuration that make sense for the target platform
+
+The test resources include highly sensitive data.
+
+## Current baseline
+
+| Area | Current value |
 | --- | --- |
 | Java | 17 |
 | Spring Boot | 2.7.18 |
@@ -13,7 +40,7 @@ Small customer registry service used for technical assessment work. It manages c
 | Migrations | Flyway |
 | API docs | OpenAPI |
 
-## Running locally
+## Running the current application
 
 Use JDK 17 as `JAVA_HOME`.
 
@@ -66,7 +93,3 @@ OpenAPI:
 http://localhost:8080/v3/api-docs
 http://localhost:8080/swagger-ui/
 ```
-
-## Data handling
-
-The test resources include sensitive data.
