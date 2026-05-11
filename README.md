@@ -4,17 +4,27 @@ This repository contains a customer registry service used for a technical assess
 
 ## Assessment task
 
-Upgrade the application to:
+Upgrade and modernize this application while preserving the existing customer registry behavior.
+
+### Target platform
 
 - Latest Spring Boot 4.x
 - Java 25
 - Latest stable Gradle version available when you start the task
 
+### Tooling
+
 You are expected to use AI tools, agents, skills, or other developer tooling as part of the work. Bring your own setup if you have one.
 
-The goal is to modernize the application while preserving the existing customer registry behavior. You may change dependencies, build configuration, application code, tests, and runtime configuration as needed.
+### Scope
+
+You may change dependencies, build configuration, application code, tests, and runtime configuration as needed.
 
 Work on a local branch. You do not need to create commits or push your work unless asked during the interview.
+
+### Compatibility
+
+Do not introduce breaking changes to the existing customer registry REST contract. Existing endpoints, authentication expectations, request/response semantics, and core behavior should remain compatible unless there is a clear reason to change them.
 
 ## Acceptance criteria
 
@@ -23,7 +33,7 @@ The upgraded application should:
 - Build and test successfully from a clean checkout
 - Start locally without manual database setup
 - Preserve the existing customer registry functionality
-- Keep the REST API usable
+- Preserve the existing REST API contract
 - Keep the test suite meaningful and passing
 - Use dependencies and build configuration that make sense for the target platform
 
