@@ -1,0 +1,6 @@
+customerNumber,firstName,lastName,dateOfBirth,email,phoneNumber,streetAddress,note
+T-900001,Amalie,Ruud,1983-04-18,amalie.ruud@example.com,+47 555 90 101,Testveien 14 Oslo,Manual review requested
+T-900002,Henrik,Nilsen,1976-09-02,henrik.nilsen@example.com,+47 555 90 102,Provegata 2 Bergen,Address proof pending
+T-900003,Selma,Bakke,1991-12-30,selma.bakke@example.com,+47 555 90 103,Kontrollstien 8 Trondheim,Duplicate email check
+T-900004,Isak,Lie,1969-07-21,isak.lie@example.com,+47 555 90 104,Eksempelveien 33 Stavanger,Customer called support
+T-900005,Tuva,Hagen,1988-01-09,tuva.hagen@example.com,+47 555 90 105,Demogata 5 Tromso,Consent confirmation missing

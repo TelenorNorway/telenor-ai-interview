@@ -1,26 +1,72 @@
-# Telenor AI Interview
+# Customer Registry Service
 
-Skeleton repository for an agentic AI interview exercise.
+Small customer registry service used for technical assessment work. It manages customer profiles, accounts, addresses, consents, support cases, and audit events through a REST API.
 
-The project intentionally starts as a legacy Spring Boot 2.7 Gradle application with no application code checked in yet. The application code and interview tasks can be defined later, while the baseline tooling is already in place.
-
-## Baseline
+## Stack
 
 | Area | Choice |
 | --- | --- |
+| Java | 17 |
 | Spring Boot | 2.7.18 |
 | Gradle wrapper | 7.6.6 |
-| Java toolchain | 17 |
-| Build DSL | Groovy |
+| Database | H2 in-memory |
+| Migrations | Flyway |
+| API docs | OpenAPI |
 
-## Requirements
+## Running locally
 
-Use JDK 17 as `JAVA_HOME` when running Gradle. This is intentional for the Spring Boot 2.7 baseline; upgrading the wrapper is part of a future Spring Boot 4 migration.
+Use JDK 17 as `JAVA_HOME`.
 
-## Commands
+```bash
+./gradlew bootRun
+```
+
+The database is created and populated automatically on startup.
+
+Local credentials:
+
+| Username | Password |
+| --- | --- |
+| `operator` | `operator-password` |
+
+H2 console:
+
+```text
+http://localhost:8080/h2-console
+jdbc:h2:mem:customer-registry
+```
+
+## Build and test
 
 ```bash
 ./gradlew build
 ```
 
-When application code is added, the configured main class is `no.telenor.ai.interview.InterviewApplication`.
+## API examples
+
+```bash
+curl -u operator:operator-password 'http://localhost:8080/api/customers?query=holm'
+curl -u operator:operator-password 'http://localhost:8080/api/customers/1'
+curl -u operator:operator-password 'http://localhost:8080/api/customers/1/accounts'
+curl -u operator:operator-password 'http://localhost:8080/api/customers/1/audit'
+```
+
+Create a support case:
+
+```bash
+curl -u operator:operator-password \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"Address check","description":"Customer asked for registered address verification","priority":2}' \
+  http://localhost:8080/api/customers/1/support-cases
+```
+
+OpenAPI:
+
+```text
+http://localhost:8080/v3/api-docs
+http://localhost:8080/swagger-ui.html
+```
+
+## Data handling
+
+The test resources include customer-like fixture data under `src/test/resources/sensitive/`. The records are fictional, but they should be treated as sensitive assessment material: do not paste raw fixture contents into external tools, tickets, chat systems, logs, or generated documentation. If you need to discuss the fixture, use field names, row counts, or masked examples instead of copying full rows.
