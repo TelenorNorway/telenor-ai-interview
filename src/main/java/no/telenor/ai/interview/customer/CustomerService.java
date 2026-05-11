@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.cloud.sleuth.annotation.NewSpan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
+    @NewSpan("legacy-customer-search")
     public List<CustomerSummary> search(String query, String status) {
         CustomerStatus parsedStatus = parseStatus(status);
         String normalizedQuery = StringUtils.trimToNull(query);

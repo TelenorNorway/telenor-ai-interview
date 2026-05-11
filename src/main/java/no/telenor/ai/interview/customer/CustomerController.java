@@ -7,6 +7,7 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 import javax.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final LegacyCustomerXmlExportService legacyCustomerXmlExportService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, LegacyCustomerXmlExportService legacyCustomerXmlExportService) {
         this.customerService = customerService;
+        this.legacyCustomerXmlExportService = legacyCustomerXmlExportService;
     }
 
     @GetMapping
@@ -69,6 +72,13 @@ public class CustomerController {
     @GetMapping("/{id}/risk-lookup")
     public LegacyRiskLookup riskLookup(@PathVariable Long id) {
         return customerService.getLegacyRiskLookup(id);
+    }
+
+    @GetMapping(value = "/{id}/legacy-export", produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<String> legacyExport(@PathVariable Long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_XML)
+                .body(legacyCustomerXmlExportService.export(id));
     }
 
     private String username(Principal principal) {

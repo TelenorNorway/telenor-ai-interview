@@ -1,9 +1,12 @@
 package no.telenor.ai.interview.customer;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,7 +63,7 @@ class CustomerControllerTest {
     void openApiDescriptionIsAvailableWithoutCredentials() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.openapi").exists());
+                .andExpect(jsonPath("$.paths").exists());
     }
 
     @Test
@@ -71,5 +74,22 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.customerNumber").value("C-100003"))
                 .andExpect(jsonPath("$.riskBand").value("HIGH"))
                 .andExpect(jsonPath("$.lookupUri").value(org.hamcrest.Matchers.containsString("customerNumber=C-100003")));
+    }
+
+    @Test
+    void legacyXmlExportReturnsCustomerData() throws Exception {
+        mockMvc.perform(get("/api/customers/1/legacy-export")
+                        .with(httpBasic("operator", "operator-password")))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML))
+                .andExpect(content().string(containsString("<customerNumber>C-100001</customerNumber>")))
+                .andExpect(content().string(containsString("<name>Mira Holm</name>")));
+    }
+
+    @Test
+    void legacyFilterAddsResponseHeader() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Legacy-Filter", "legacy-servlet-filter"));
     }
 }
