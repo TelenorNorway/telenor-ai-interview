@@ -10,7 +10,7 @@ Upgrade and modernize this application while preserving the existing customer re
 
 - Latest Spring Boot 4.x
 - Java 25
-- Latest stable Gradle version available when you start the task
+- Latest stable Gradle 9.x
 
 ### Tooling
 
